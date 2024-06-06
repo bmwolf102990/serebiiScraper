@@ -1,4 +1,9 @@
 node_modules
 
-sprites/*
-!sprites/.gitkeep
+sprites/normal/*
+!sprites/normal/.gitkeep
+
+sprites/shiny/*
+!sprites/shiny/.gitkeep
+
+.DS_Store
