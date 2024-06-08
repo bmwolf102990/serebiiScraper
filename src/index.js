@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 
+// array of Pokédex numbers of all mons available in Pokémon Sleep
 const sleepDex = [
     '1',
     '2',
@@ -135,7 +136,28 @@ const sleepDex = [
     '764',
     '845'
 ];
-
+// array of Pokémon types
+const pokemonTypes = [
+    'bug',
+    'dark',
+    'dragon',
+    'electric',
+    'fairy',
+    'fighting',
+    'fire',
+    'flying',
+    'ghost',
+    'grass',
+    'ground',
+    'ice',
+    'normal',
+    'poison',
+    'psychic',
+    'rock',
+    'steel',
+    'water'
+];
+// IIFE for scraping normal sprite images
 (async () => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
@@ -144,7 +166,7 @@ const sleepDex = [
   for (let i = 0; i < sleepDex.length; i++) {
     try {
       
-      await fs.promises.stat(`../sprites/normal/${sleepDex[i]}.png`);
+      await fs.promises.stat(`../assets/sprites/normal/${sleepDex[i]}.png`);
       continue;
     
     } catch(err) {
@@ -157,7 +179,7 @@ const sleepDex = [
 
     try {
     
-      await fs.promises.writeFile(`../sprites/normal/${sleepDex[i]}.png`, await viewSource.buffer());
+      await fs.promises.writeFile(`../assets/sprites/normal/${sleepDex[i]}.png`, await viewSource.buffer());
     
     } catch(err) {
     
@@ -169,7 +191,7 @@ const sleepDex = [
 
   await browser.close();
 })();
-
+// IIFE for scraping shiny sprite images
 (async () => {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
@@ -179,7 +201,7 @@ const sleepDex = [
       
       try {
     
-        await fs.promises.stat(`../sprites/shiny/${sleepDex[i]}.png`);
+        await fs.promises.stat(`../assets/sprites/shiny/${sleepDex[i]}.png`);
         continue;
     
       } catch(err) {
@@ -192,11 +214,46 @@ const sleepDex = [
   
       try {
       
-        await fs.promises.writeFile(`../sprites/shiny/${sleepDex[i]}.png`, await viewSource.buffer());
+        await fs.promises.writeFile(`../assets/sprites/shiny/${sleepDex[i]}.png`, await viewSource.buffer());
       
       } catch(err) {
       
         console.log(`Something went wrong on image: ${sleepDex[i]}`);
+        console.log(err);
+      
+      }
+    }
+  
+    await browser.close();
+})();
+// IIFE for scraping type icons
+(async () => {
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+          page.setDefaultNavigationTimeout(0);
+  
+    for (let i = 0; i < pokemonTypes.length; i++) {
+      
+      try {
+    
+        await fs.promises.stat(`../assets/types/${pokemonTypes[i]}.png`);
+        continue;
+    
+      } catch(err) {
+      
+        // place error log here if needed
+    
+      }
+
+      let viewSource = await page.goto(`https://serebii.net/pokemonsleep/pokemon/type/${pokemonTypes[i]}.png`);
+  
+      try {
+      
+        await fs.promises.writeFile(`../assets/types/${pokemonTypes[i]}.png`, await viewSource.buffer());
+      
+      } catch(err) {
+      
+        console.log(`Something went wrong on image: ${pokemonTypes[i]}`);
         console.log(err);
       
       }
