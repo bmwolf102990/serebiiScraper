@@ -1,9 +1,12 @@
 node_modules
 
-sprites/normal/*
-!sprites/normal/.gitkeep
+assets/sprites/normal/*
+!assets/sprites/normal/.gitkeep
 
-sprites/shiny/*
-!sprites/shiny/.gitkeep
+assets/sprites/shiny/*
+!assets/sprites/shiny/.gitkeep
+
+assets/types/*
+!assets/types/.gitkeep
 
 .DS_Store
