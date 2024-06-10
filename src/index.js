@@ -157,6 +157,26 @@ const pokemonTypes = [
     'steel',
     'water'
 ];
+// array of berries that Pokémon can gather in Pokémon Sleep
+const berries = [
+  'belueberry',
+  'blukberry',
+  'cheriberry',
+  'chestoberry',
+  'durinberry',
+  'grepaberry',
+  'leppaberry',
+  'lumberry',
+  'magoberry',
+  'oranberry',
+  'pamtreberry',
+  'pechaberry',
+  'persimberry',
+  'rawstberry',
+  'sitrusberry',
+  'wikiberry',
+  'yacheberry',
+];
 // IIFE for scraping normal sprite images
 (async () => {
   const browser = await puppeteer.launch();
@@ -260,4 +280,39 @@ const pokemonTypes = [
     }
   
     await browser.close();
+})();
+// IIFE for scraping berry icons
+(async () => {
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+        page.setDefaultNavigationTimeout(0);
+
+  for (let i = 0; i < berries.length; i++) {
+    
+    try {
+  
+      await fs.promises.stat(`../assets/berries/${berries[i]}.png`);
+      continue;
+  
+    } catch(err) {
+    
+      // place error log here if needed
+  
+    }
+
+    let viewSource = await page.goto(`https://serebii.net/pokemonsleep/berries/${berries[i]}.png`);
+
+    try {
+    
+      await fs.promises.writeFile(`../assets/berries/${berries[i]}.png`, await viewSource.buffer());
+    
+    } catch(err) {
+    
+      console.log(`Something went wrong on image: ${berries[i]}`);
+      console.log(err);
+    
+    }
+  }
+
+  await browser.close();
 })();

@@ -1,5 +1,8 @@
 node_modules
 
+assets/berries/*
+!assets/berries/.gitkeep
+
 assets/sprites/normal/*
 !assets/sprites/normal/.gitkeep
 
