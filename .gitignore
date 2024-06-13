@@ -3,6 +3,21 @@ node_modules
 assets/berries/*
 !assets/berries/.gitkeep
 
+assets/dishes/curries/*
+!assets/dishes/curries/.gitkeep
+
+assets/dishes/desserts/*
+!assets/dishes/desserts/.gitkeep
+
+assets/dishes/salads/*
+!assets/dishes/salads/.gitkeep
+
+assets/ingredients/*
+!assets/ingredients/.gitkeep
+
+assets/items/*
+!assets/items/.gitkeep
+
 assets/sprites/normal/*
 !assets/sprites/normal/.gitkeep
 
