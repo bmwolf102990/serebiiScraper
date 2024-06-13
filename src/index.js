@@ -1,7 +1,13 @@
+/*
+=============================================================
+this is a scraper tool for pulling resources from serebii.net
+=============================================================
+*/
+
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 
-// array of Pokédex numbers of all mons available in Pokémon Sleep
+// array of Pokédex numbers
 const sleepDex = [
     '1',
     '2',
@@ -134,7 +140,8 @@ const sleepDex = [
     '759',
     '760',
     '764',
-    '845'
+    '845',
+    '25-nightcap'
 ];
 // array of Pokémon types
 const pokemonTypes = [
@@ -157,7 +164,7 @@ const pokemonTypes = [
     'steel',
     'water'
 ];
-// array of berries that Pokémon can gather in Pokémon Sleep
+// array of in-game berries
 const berries = [
   'belueberry',
   'blukberry',
@@ -175,10 +182,157 @@ const berries = [
   'rawstberry',
   'sitrusberry',
   'wikiberry',
-  'yacheberry',
+  'yacheberry'
 ];
-// IIFE for scraping normal sprite images
-(async () => {
+// array of in-game items
+const items = [
+  'bonusbiscuit',
+  'dawnstone',
+  'dreamclusterl',
+  'dreamclusterm',
+  'dreamclusters',
+  'energypillow',
+  'e-zzztravelticket',
+  'firecandy',
+  'firestone',
+  'focusincense',
+  'friendincense',
+  'goodcampticket',
+  'greatbiscuit',
+  'growthincense',
+  'handycandyl',
+  'handycandym',
+  'handycandys',
+  'helperwhistle',
+  'icestone',
+  'ingredientticketl',
+  'ingredientticketm',
+  'ingredienttickets',
+  'king\'srock',
+  'leafstone',
+  'linkingcord',
+  'luckincense',
+  'mainskillseed',
+  'masterbiscuit',
+  'metalcoat',
+  'moonstone',
+  'ovalstone',
+  'pokebiscuit',
+  'premiumbonusbiscuit',
+  'recoveryincense',
+  'shinystone',
+  'subskillseed',
+  'thunderstone',
+  'waterstone',
+  'bugincense',
+  'darkincense',
+  'dragonincense',
+  'electricincense',
+  'fairyincense',
+  'fightingincense',
+  'fireincense',
+  'flyingincense',
+  'ghostincense',
+  'grassincense',
+  'groundincense',
+  'iceincense',
+  'normalincense',
+  'poisonincense',
+  'psychicincense',
+  'rockincense',
+  'steelincense',
+  'waterincense'
+];
+// array of in-game ingredients
+const ingredients =[
+  'beansausage',
+  'fancyapple',
+  'fancyegg',
+  'fieryherb',
+  'greengrasscorn',
+  'greengrasssoybeans',
+  'honey',
+  'largeleek',
+  'moomoomilk',
+  'pureoil',
+  'slowpoketail',
+  'snoozytomato',
+  'softpotato',
+  'soothingcacao',
+  'tastymushroom',
+  'warmingginger'
+];
+// array of in-game dishes
+const dishes = {
+  curry: [
+    'mixedcurry',
+    'fancyapplecurry',
+    'grilledtailcurry',
+    'solarpowertomatocurry',
+    'dreameaterbuttercurry',
+    'spicyleekcurry',
+    'sporemushroomcurry',
+    'eggbombcurry',
+    'heartycheeseburgercurry',
+    'softpotatochowder',
+    'simplechowder',
+    'beanburgercurry',
+    'mildhoneycurry',
+    'ninjacurry',
+    'droughtkatsucurry',
+    'meltyomelettecurry',
+    'bulkupbeancurry',
+    'limbercornstew',
+    'infernocornkeemacurry'
+  ],
+  dessert: [
+    'mixedjuice',
+    'fluffysweetpotatoes',
+    'steadfastgingercookies',
+    'fancyapplejuice',
+    'craftsodapop',
+    'embergingertea',
+    'jigglypuff\'sfruityflan',
+    'lovelykisssmoothie',
+    'luckchantapplepie',
+    'neroli\'srestorativetea',
+    'sweetscentchocolatecake',
+    'warmmoomoomilk',
+    'cloudninesoycake',
+    'hustleproteinsmoothie',
+    'stalwartvegetablejuice',
+    'bigmalasada',
+    'hugepowersoydonuts',
+    'explosionpopcorn',
+    'teatimecornscones',
+    'petaldancechocolatetart',
+    'flowergiftmacarons'
+  ],
+  salad: [
+    'mixedsalad',
+    'slowpoketailpeppersalad',
+    'sporemushroomsalad',
+    'snowcloakcaesarsalad',
+    'gluttonypotatosalad',
+    'waterveiltofusalad',
+    'superpowerextremesalad',
+    'beanhamsalad',
+    'snoozytomatosalad',
+    'moomoocapresesalad',
+    'contrarychocolatemeatsalad',
+    'overheatgingersalad',
+    'fancyapplesalad',
+    'immunityleeksalad',
+    'dazzlingapplecheesesalad',
+    'ninjasalad',
+    'heatwavetofusalad',
+    'greengrasssalad',
+    'calmmindfruitsalad',
+    'furyattackcornsalad'
+  ],
+};
+// scraper function
+const serebiiScraper = async (data, filepath, source) => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
         page.setDefaultNavigationTimeout(0);
@@ -186,7 +340,7 @@ const berries = [
   for (let i = 0; i < sleepDex.length; i++) {
     try {
       
-      await fs.promises.stat(`../assets/sprites/normal/${sleepDex[i]}.png`);
+      await fs.promises.stat(`${filepath}${data[i]}.png`);
       continue;
     
     } catch(err) {
@@ -195,124 +349,37 @@ const berries = [
     
     };
 
-    let viewSource = await page.goto(`https://serebii.net/pokemonsleep/pokemon/${sleepDex[i]}.png`);
+    let viewSource = await page.goto(`${source}${data[i]}.png`);
 
     try {
     
-      await fs.promises.writeFile(`../assets/sprites/normal/${sleepDex[i]}.png`, await viewSource.buffer());
+      await fs.promises.writeFile(`${filepath}${data[i]}.png`, await viewSource.buffer());
     
     } catch(err) {
     
-      console.log(`Something went wrong on image: ${sleepDex[i]}`);
+      console.log(`Something went wrong on image: ${data[i]}`);
       console.log(err);
     
     }
   }
 
   await browser.close();
-})();
-// IIFE for scraping shiny sprite images
-(async () => {
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-          page.setDefaultNavigationTimeout(0);
-  
-    for (let i = 0; i < sleepDex.length; i++) {
-      
-      try {
-    
-        await fs.promises.stat(`../assets/sprites/shiny/${sleepDex[i]}.png`);
-        continue;
-    
-      } catch(err) {
-      
-        // place error log here if needed
-    
-      }
-
-      let viewSource = await page.goto(`https://serebii.net/pokemonsleep/pokemon/shiny/${sleepDex[i]}.png`);
-  
-      try {
-      
-        await fs.promises.writeFile(`../assets/sprites/shiny/${sleepDex[i]}.png`, await viewSource.buffer());
-      
-      } catch(err) {
-      
-        console.log(`Something went wrong on image: ${sleepDex[i]}`);
-        console.log(err);
-      
-      }
-    }
-  
-    await browser.close();
-})();
-// IIFE for scraping type icons
-(async () => {
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-          page.setDefaultNavigationTimeout(0);
-  
-    for (let i = 0; i < pokemonTypes.length; i++) {
-      
-      try {
-    
-        await fs.promises.stat(`../assets/types/${pokemonTypes[i]}.png`);
-        continue;
-    
-      } catch(err) {
-      
-        // place error log here if needed
-    
-      }
-
-      let viewSource = await page.goto(`https://serebii.net/pokemonsleep/pokemon/type/${pokemonTypes[i]}.png`);
-  
-      try {
-      
-        await fs.promises.writeFile(`../assets/types/${pokemonTypes[i]}.png`, await viewSource.buffer());
-      
-      } catch(err) {
-      
-        console.log(`Something went wrong on image: ${pokemonTypes[i]}`);
-        console.log(err);
-      
-      }
-    }
-  
-    await browser.close();
-})();
-// IIFE for scraping berry icons
-(async () => {
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-        page.setDefaultNavigationTimeout(0);
-
-  for (let i = 0; i < berries.length; i++) {
-    
-    try {
-  
-      await fs.promises.stat(`../assets/berries/${berries[i]}.png`);
-      continue;
-  
-    } catch(err) {
-    
-      // place error log here if needed
-  
-    }
-
-    let viewSource = await page.goto(`https://serebii.net/pokemonsleep/berries/${berries[i]}.png`);
-
-    try {
-    
-      await fs.promises.writeFile(`../assets/berries/${berries[i]}.png`, await viewSource.buffer());
-    
-    } catch(err) {
-    
-      console.log(`Something went wrong on image: ${berries[i]}`);
-      console.log(err);
-    
-    }
-  }
-
-  await browser.close();
-})();
+}
+// scrapes normal sprite images
+serebiiScraper(sleepDex, '../assets/sprites/normal/', 'https://serebii.net/pokemonsleep/pokemon/');
+// scrapes shiny sprite images
+serebiiScraper(sleepDex, '../assets/sprites/shiny/', 'https://serebii.net/pokemonsleep/pokemon/shiny/');
+// scrapes type images
+serebiiScraper(pokemonTypes, '../assets/types/', 'https://serebii.net/pokemonsleep/pokemon/type/');
+// scrapes berry images
+serebiiScraper(berries, '../assets/berries/', 'https://serebii.net/pokemonsleep/berries/');
+// scrapes item images
+serebiiScraper(items, '../assets/items/', 'https://serebii.net/pokemonsleep/items/');
+// scrapes ingredient images
+serebiiScraper(ingredients, '../assets/ingredients/', 'https://serebii.net/pokemonsleep/ingredients/');
+// scrapes curry dish images
+serebiiScraper(dishes.curry, '../assets/dishes/curries/', 'https://serebii.net/pokemonsleep/meals/');
+// scrapes dessert dish images
+serebiiScraper(dishes.dessert, '../assets/dishes/desserts/', 'https://serebii.net/pokemonsleep/meals/');
+// scrapes salad dish images
+serebiiScraper(dishes.salad, '../assets/dishes/salads/', 'https://serebii.net/pokemonsleep/meals/');
